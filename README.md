@@ -1,16 +1,19 @@
 ## Potrzebujemy:
-- Założyć i dodać mnie jako ownera
+
+- <s>Założyć i dodać mnie jako ownera</s>
 - Dla mnie (Michał) - założyc trello na którym będziemy operować
+
 ## Założenia techniczne
-- Backend w Nest
-- Baza PostgreSQL + Prisma
-- Docker + docker compose do lokalnego środowiska
+
+- <s>Backend w Nest</s>
+- <s>Baza PostgreSQL + Prisma</s>
+- <s>Docker + docker compose do lokalnego środowiska</s>
 - Testy unitowe
 - Test integracyjny
-- Tworzę snippet i pobieram jego zawartość
-- CI/CD
-- PR sprawdzał linta
-- odpalał unity
+- <s>Tworzę snippet i pobieram jego zawartość</s>
+- <s>CI/CD</s>
+- <s>PR sprawdzał linta</s>
+- <s>odpalał unity</s>
 
 ## Description
 
