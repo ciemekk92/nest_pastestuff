@@ -18,6 +18,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migrate:test": "dotenv -e .env.test -- npx prisma migrate deploy",
+    "test:e2e-docker": "dotenv -e .env.test -- npm run test:e2e",
+    "test:e2e-local": "npm run migrate:test && npm run test:e2e-docker",
     "prisma:generate": "npx prisma generate"
   },
   "dependencies": {
@@ -26,6 +29,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "^4.11.0",
+    "dotenv-cli": "^7.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0"
   },
