@@ -5,15 +5,18 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  Delete
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { SnippetsService } from './snippets.service';
 import { CreateSnippetDto } from './dto/create-snippet.dto';
 import { UpdateSnippetDto } from './dto/update-snippet.dto';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { SnippetDto } from './dto/snippet.dto';
 
 @Controller('snippets')
 @ApiTags('snippets')
+@Serialize(SnippetDto)
 export class SnippetsController {
   constructor(private readonly snippetsService: SnippetsService) {}
 

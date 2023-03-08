@@ -9,7 +9,7 @@ describe('Snippets', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [SnippetsModule],
+      imports: [SnippetsModule]
     }).compile();
 
     app = moduleRef.createNestApplication();
@@ -39,7 +39,7 @@ describe('Snippets', () => {
 
   it('/GET should return all snippets', async () => {
     await prisma.snippet.createMany({
-      data: [{ content: 'Test snippet 1' }, { content: 'Test snippet 2' }],
+      data: [{ content: 'Test snippet 1' }, { content: 'Test snippet 2' }]
     });
 
     const test = await request(app.getHttpServer())

@@ -9,7 +9,7 @@ describe('SnippetsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SnippetsController],
-      providers: [SnippetsService, PrismaService],
+      providers: [SnippetsService, PrismaService]
     }).compile();
 
     controller = module.get<SnippetsController>(SnippetsController);
