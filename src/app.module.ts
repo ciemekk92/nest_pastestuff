@@ -6,6 +6,6 @@ import { SnippetsModule } from './snippets/snippets.module';
 @Module({
   imports: [SnippetsModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService]
 })
 export class AppModule {}

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PasswordUtil } from '../utils/PasswordUtil/PasswordUtil';
 import { CreateSnippetDto } from './dto/create-snippet.dto';
 import { UpdateSnippetDto } from './dto/update-snippet.dto';
 
@@ -7,8 +8,16 @@ import { UpdateSnippetDto } from './dto/update-snippet.dto';
 export class SnippetsService {
   constructor(private prismaService: PrismaService) {}
 
-  create(createSnippetDto: CreateSnippetDto) {
-    return this.prismaService.snippet.create({ data: createSnippetDto });
+  async create(createSnippetDto: CreateSnippetDto) {
+    let password = createSnippetDto.password;
+
+    if (createSnippetDto.isProtected && password) {
+      password = await PasswordUtil.hashPassword(password);
+    }
+
+    return this.prismaService.snippet.create({
+      data: { ...createSnippetDto, password }
+    });
   }
 
   findAll() {
@@ -22,7 +31,7 @@ export class SnippetsService {
   update(id: string, updateSnippetDto: UpdateSnippetDto) {
     return this.prismaService.snippet.update({
       where: { id },
-      data: updateSnippetDto,
+      data: { ...updateSnippetDto, updatedAt: new Date(Date.now()) }
     });
   }
 
