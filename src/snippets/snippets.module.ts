@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SnippetsService } from './snippets.service';
 import { SnippetsController } from './snippets.controller';
-import { PrismaModule } from '../../src/prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   controllers: [SnippetsController],

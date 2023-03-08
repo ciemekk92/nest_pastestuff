@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { SnippetsService } from './snippets.service';
 import { CreateSnippetDto } from './dto/create-snippet.dto';
 import { UpdateSnippetDto } from './dto/update-snippet.dto';
 
 @Controller('snippets')
+@ApiTags('snippets')
 export class SnippetsController {
   constructor(private readonly snippetsService: SnippetsService) {}
 
