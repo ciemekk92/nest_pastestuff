@@ -13,6 +13,20 @@ jobs:
     defaults:
       run:
         working-directory: ${{env.working-directory}}
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5434:5432
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       matrix:
         node-version: [18.x]
@@ -31,3 +45,5 @@ jobs:
         run: npm run lint
       - name: Run tests
         run: npm run test
+      - name: Run E2E tests
+        run: npm run test:e2e-local
