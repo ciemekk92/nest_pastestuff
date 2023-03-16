@@ -1,22 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { PasswordUtil } from '../utils/PasswordUtil/PasswordUtil';
+import { SnippetMetadatasService } from '../snippet-metadatas/snippet-metadatas.service';
 import { CreateSnippetDto } from './dto/create-snippet.dto';
 import { UpdateSnippetDto } from './dto/update-snippet.dto';
 
 @Injectable()
 export class SnippetsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private snippetMetadatasService: SnippetMetadatasService
+  ) {}
 
   async create(createSnippetDto: CreateSnippetDto) {
-    let password = createSnippetDto.password;
-
-    if (createSnippetDto.isProtected && password) {
-      password = await PasswordUtil.hashPassword(password);
-    }
+    const { title, content, password } = createSnippetDto;
 
     return this.prismaService.snippet.create({
-      data: { ...createSnippetDto, password }
+      data: {
+        title,
+        content,
+        metadata: {
+          create: this.snippetMetadatasService.createSnippetMetadata(password)
+        }
+      }
     });
   }
 
@@ -28,10 +33,23 @@ export class SnippetsService {
     return this.prismaService.snippet.findUnique({ where: { id } });
   }
 
-  update(id: string, updateSnippetDto: UpdateSnippetDto) {
+  async update(id: string, { newPassword, title, content }: UpdateSnippetDto) {
+    const currentSnippet = await this.prismaService.snippet.findUnique({
+      where: { id }
+    });
+
+    if (!currentSnippet) throw new NotFoundException('Snippet not found');
+
+    if (newPassword) {
+      await this.snippetMetadatasService.updateSnippetMetadata(
+        currentSnippet.id,
+        newPassword
+      );
+    }
+
     return this.prismaService.snippet.update({
       where: { id },
-      data: { ...updateSnippetDto, updatedAt: new Date(Date.now()) }
+      data: { title, content }
     });
   }
 

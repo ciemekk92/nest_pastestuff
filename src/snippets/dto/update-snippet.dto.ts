@@ -1,20 +1,24 @@
-import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import { RequiredWhenTrue } from '../../decorators/RequiredWhenTrue';
-import { CreateSnippetDto } from './create-snippet.dto';
+import { IsString, MaxLength, MinLength } from 'class-validator';
 
-export class UpdateSnippetDto extends PartialType(CreateSnippetDto) {
+export class UpdateSnippetDto {
+  @ApiProperty()
+  @IsString()
+  title?: string;
+
   @ApiProperty()
   @IsString()
   content?: string;
 
   @ApiProperty()
-  @IsBoolean()
-  @IsOptional()
-  isProtected?: boolean;
+  @IsString()
+  @MinLength(6, { message: 'Password must have minimum 6 characters' })
+  @MaxLength(20, { message: 'Password must have maximum of 20 characters' })
+  password?: string;
 
   @ApiProperty()
-  @RequiredWhenTrue('isProtected', { message: 'Password is required.' })
-  password?: string;
+  @IsString()
+  @MinLength(6, { message: 'Password must have minimum 6 characters' })
+  @MaxLength(20, { message: 'Password must have maximum of 20 characters' })
+  newPassword?: string;
 }

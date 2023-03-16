@@ -8,11 +8,11 @@ export class SnippetDto {
   content: string;
 
   @Expose()
+  title: string;
+
+  @Expose()
   createdAt: Date;
 
   @Expose()
   updatedAt: Date;
-
-  @Expose()
-  isProtected: boolean;
 }

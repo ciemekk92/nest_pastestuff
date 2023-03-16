@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 import { SnippetsModule } from '../src/snippets/snippets.module';
@@ -13,6 +13,7 @@ describe('Snippets', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
 
@@ -27,7 +28,7 @@ describe('Snippets', () => {
     await app.close();
   });
 
-  it('/POST should create new snippet', async () => {
+  it('/POST should create new snippet without password', async () => {
     const test = await request(app.getHttpServer())
       .post('/snippets')
       .send({ content: 'Test snippet post' })
@@ -35,6 +36,48 @@ describe('Snippets', () => {
       .expect(201);
 
     expect(test.body).toHaveProperty('content', 'Test snippet post');
+  });
+
+  it('/POST should create new snippet with password for correct request', async () => {
+    const test = await request(app.getHttpServer())
+      .post('/snippets')
+      .send({
+        content: 'Test snippet with password',
+        isProtected: true,
+        password: 'test_pw'
+      })
+      .set('Content-Type', 'application/json')
+      .expect(201);
+
+    expect(test.body).toHaveProperty('content', 'Test snippet with password');
+    expect(test.body).toHaveProperty('isProtected', true);
+  });
+
+  it('/POST should return error when password is missing', async () => {
+    await request(app.getHttpServer())
+      .post('/snippets')
+      .send({
+        content: 'Test snippet with password',
+        isProtected: true
+      })
+      .set('Content-Type', 'application/json')
+      .expect(400);
+  });
+
+  it('/PATCH should update a snippet without password', async () => {
+    const createdSnippet = await request(app.getHttpServer())
+      .post('/snippets')
+      .send({ content: 'Test snippet' })
+      .set('Content-Type', 'application/json')
+      .expect(201);
+
+    const updatedSnippet = await request(app.getHttpServer())
+      .patch(`/snippets/${createdSnippet.body.id}`)
+      .send({ content: 'Updated snippet' })
+      .set('Content-Type', 'application/json')
+      .expect(200);
+
+    expect(updatedSnippet.body).toHaveProperty('content', 'Updated snippet');
   });
 
   it('/GET should return all snippets', async () => {

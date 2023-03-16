@@ -5,14 +5,16 @@ import {
   Body,
   Patch,
   Param,
-  Delete
+  Delete,
+  UseGuards
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { SnippetsService } from './snippets.service';
 import { CreateSnippetDto } from './dto/create-snippet.dto';
 import { UpdateSnippetDto } from './dto/update-snippet.dto';
-import { Serialize } from '../interceptors/serialize.interceptor';
+import { Serialize } from '../shared/interceptors/serialize.interceptor';
 import { SnippetDto } from './dto/snippet.dto';
+import { SnippetPasswordGuard } from '../shared/guards/snippet.password.guard';
 
 @Controller('snippets')
 @ApiTags('snippets')
@@ -31,6 +33,7 @@ export class SnippetsController {
   }
 
   @Get(':id')
+  @UseGuards(SnippetPasswordGuard)
   findOne(@Param('id') id: string) {
     return this.snippetsService.findOne(id);
   }
