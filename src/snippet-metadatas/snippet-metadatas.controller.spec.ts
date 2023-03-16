@@ -8,10 +8,12 @@ describe('SnippetMetadatasController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SnippetMetadatasController],
-      providers: [SnippetMetadatasService],
+      providers: [SnippetMetadatasService]
     }).compile();
 
-    controller = module.get<SnippetMetadatasController>(SnippetMetadatasController);
+    controller = module.get<SnippetMetadatasController>(
+      SnippetMetadatasController
+    );
   });
 
   it('should be defined', () => {

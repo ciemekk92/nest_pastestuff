@@ -6,7 +6,7 @@ describe('SnippetMetadatasService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SnippetMetadatasService],
+      providers: [SnippetMetadatasService]
     }).compile();
 
     service = module.get<SnippetMetadatasService>(SnippetMetadatasService);
