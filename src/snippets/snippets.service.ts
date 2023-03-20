@@ -34,6 +34,8 @@ export class SnippetsService {
         result.id,
         deleteAfterHours
       );
+
+    return result;
   }
 
   findAll() {
