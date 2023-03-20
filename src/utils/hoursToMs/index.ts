@@ -1,0 +1,1 @@
+export { hoursToMs } from './hoursToMs';

@@ -1,13 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PasswordUtil } from '../utils/PasswordUtil/PasswordUtil';
+import { SnippetMetadataConfig } from './snippet-metadatas.types';
 
 @Injectable()
 export class SnippetMetadatasService {
   constructor(private prismaService: PrismaService) {}
 
-  async createSnippetMetadata(password?: string) {
-    return { password: await PasswordUtil.hashPassword(password) };
+  async createSnippetMetadata({
+    password,
+    deleteAfterHours
+  }: SnippetMetadataConfig) {
+    return {
+      password: await PasswordUtil.hashPassword(password),
+      deleteAfterHours
+    };
   }
 
   async updateSnippetMetadata(snippetId: string, newPassword?: string) {

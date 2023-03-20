@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SnippetMetadatasService } from './snippet-metadatas.service';
-import { SnippetMetadatasController } from './snippet-metadatas.controller';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  controllers: [SnippetMetadatasController],
-  providers: [SnippetMetadatasService]
+  providers: [SnippetMetadatasService],
+  imports: [PrismaModule],
+  exports: [SnippetMetadatasService]
 })
 export class SnippetMetadatasModule {}

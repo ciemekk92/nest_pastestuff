@@ -39,11 +39,13 @@ export class SnippetsController {
   }
 
   @Patch(':id')
+  @UseGuards(SnippetPasswordGuard)
   update(@Param('id') id: string, @Body() updateSnippetDto: UpdateSnippetDto) {
     return this.snippetsService.update(id, updateSnippetDto);
   }
 
   @Delete(':id')
+  @UseGuards(SnippetPasswordGuard)
   remove(@Param('id') id: string) {
     return this.snippetsService.remove(id);
   }

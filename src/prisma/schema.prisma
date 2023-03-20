@@ -18,8 +18,9 @@ model Snippet {
 }
 
 model SnippetMetadata {
-  id        String  @id @default(uuid())
-  password  String?
-  snippet   Snippet @relation(fields: [snippetId], references: [id])
-  snippetId String  @unique
+  id               String  @id @default(uuid())
+  password         String?
+  deleteAfterHours Int?
+  snippet          Snippet @relation(fields: [snippetId], references: [id])
+  snippetId        String  @unique
 }

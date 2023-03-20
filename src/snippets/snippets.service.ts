@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SnippetMetadatasService } from '../snippet-metadatas/snippet-metadatas.service';
+import { SnippetsCronService } from '../snippets-cron/snippets-cron.service';
 import { CreateSnippetDto } from './dto/create-snippet.dto';
 import { UpdateSnippetDto } from './dto/update-snippet.dto';
 
@@ -8,25 +9,37 @@ import { UpdateSnippetDto } from './dto/update-snippet.dto';
 export class SnippetsService {
   constructor(
     private prismaService: PrismaService,
-    private snippetMetadatasService: SnippetMetadatasService
+    private snippetMetadatasService: SnippetMetadatasService,
+    private snippetsCronService: SnippetsCronService
   ) {}
 
   async create(createSnippetDto: CreateSnippetDto) {
-    const { title, content, password } = createSnippetDto;
+    const { title, content, password, deleteAfterHours } = createSnippetDto;
 
-    return this.prismaService.snippet.create({
+    const result = await this.prismaService.snippet.create({
       data: {
         title,
         content,
         metadata: {
-          create: this.snippetMetadatasService.createSnippetMetadata(password)
+          create: await this.snippetMetadatasService.createSnippetMetadata({
+            password,
+            deleteAfterHours
+          })
         }
       }
     });
+
+    if (deleteAfterHours)
+      this.snippetsCronService.createDeleteSnippetJob(
+        result.id,
+        deleteAfterHours
+      );
   }
 
   findAll() {
-    return this.prismaService.snippet.findMany();
+    return this.prismaService.snippet.findMany({
+      where: { metadata: { password: null } }
+    });
   }
 
   findOne(id: string) {
