@@ -43,19 +43,22 @@ export class SnippetsCronService {
         Logger.log(
           `Removed snippet with id ${id} after ${metadata?.deleteAfterHours} hours.`
         );
+      } else {
+        Logger.log(
+          `Recreating job to delete snippet with id ${id} at ${dateToDelete}`
+        );
+        const job = new CronJob(dateToDelete, async () => {
+          async () => {
+            await this.prismaService.snippet.delete({ where: { id } });
+            Logger.log(
+              `Removed snippet with id ${id} after ${metadata?.deleteAfterHours} hours.`
+            );
+          };
+        });
+
+        this.schedulerRegistry.addCronJob(`remove_${id}`, job);
+        job.start();
       }
-
-      const job = new CronJob(dateToDelete, async () => {
-        async () => {
-          await this.prismaService.snippet.delete({ where: { id } });
-          Logger.log(
-            `Removed snippet with id ${id} after ${metadata?.deleteAfterHours} hours.`
-          );
-        };
-      });
-
-      this.schedulerRegistry.addCronJob(`remove_${id}`, job);
-      job.start();
     });
   }
 
