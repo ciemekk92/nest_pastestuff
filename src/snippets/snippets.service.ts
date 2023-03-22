@@ -58,7 +58,7 @@ export class SnippetsService {
     if (newPassword) {
       await this.snippetMetadatasService.updateSnippetMetadata(
         currentSnippet.id,
-        newPassword
+        { newPassword }
       );
     }
 

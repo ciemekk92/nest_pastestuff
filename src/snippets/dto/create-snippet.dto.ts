@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsInt,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength
-} from 'class-validator';
+import { IsInt, IsOptional, IsStrongPassword, IsString } from 'class-validator';
 
 export class CreateSnippetDto {
   @ApiProperty()
@@ -18,10 +12,10 @@ export class CreateSnippetDto {
 
   @ApiProperty()
   @IsOptional()
-  @MinLength(6, { message: 'Password must have minimum 6 characters' })
-  @MaxLength(20, { message: 'Password must have maximum of 20 characters' })
+  @IsStrongPassword({ minLength: 6, minUppercase: 1, minSymbols: 1 })
   password?: string;
 
+  // TODO: Change to ms
   @ApiProperty()
   @IsOptional()
   @IsInt()
