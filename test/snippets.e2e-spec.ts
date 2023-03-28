@@ -45,7 +45,7 @@ describe('Snippets', () => {
       .send({
         title: 'Test',
         content: 'Test snippet with password',
-        password: 'test_pw'
+        password: 'Test_pw1'
       })
       .set('Content-Type', 'application/json')
       .expect(201);
