@@ -15,9 +15,8 @@ export class CreateSnippetDto {
   @IsStrongPassword({ minLength: 6, minUppercase: 1, minSymbols: 1 })
   password?: string;
 
-  // TODO: Change to ms
   @ApiProperty()
   @IsOptional()
   @IsInt()
-  deleteAfterHours?: number;
+  timeToLiveMs?: number;
 }

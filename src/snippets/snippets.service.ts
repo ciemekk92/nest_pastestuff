@@ -1,7 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SnippetMetadatasService } from '../snippet-metadatas/snippet-metadatas.service';
-import { SnippetsCronService } from '../snippets-cron/snippets-cron.service';
 import { CreateSnippetDto } from './dto/create-snippet.dto';
 import { UpdateSnippetDto } from './dto/update-snippet.dto';
 
@@ -9,33 +8,24 @@ import { UpdateSnippetDto } from './dto/update-snippet.dto';
 export class SnippetsService {
   constructor(
     private prismaService: PrismaService,
-    private snippetMetadatasService: SnippetMetadatasService,
-    private snippetsCronService: SnippetsCronService
+    private snippetMetadatasService: SnippetMetadatasService
   ) {}
 
   async create(createSnippetDto: CreateSnippetDto) {
-    const { title, content, password, deleteAfterHours } = createSnippetDto;
+    const { title, content, password, timeToLiveMs } = createSnippetDto;
 
-    const result = await this.prismaService.snippet.create({
+    return this.prismaService.snippet.create({
       data: {
         title,
         content,
         metadata: {
           create: await this.snippetMetadatasService.createSnippetMetadata({
             password,
-            deleteAfterHours
+            timeToLiveMs
           })
         }
       }
     });
-
-    if (deleteAfterHours)
-      this.snippetsCronService.createDeleteSnippetJob(
-        result.id,
-        deleteAfterHours
-      );
-
-    return result;
   }
 
   findAll() {
@@ -44,8 +34,38 @@ export class SnippetsService {
     });
   }
 
-  findOne(id: string) {
-    return this.prismaService.snippet.findUnique({ where: { id } });
+  async findOne(id: string) {
+    const snippet = await this.prismaService.snippet.findUnique({
+      where: { id },
+      include: { metadata: true }
+    });
+
+    if (!snippet) {
+      throw new NotFoundException(`Snippet with given id: ${id} not found`);
+    }
+
+    if (snippet.metadata && snippet.metadata.timeToLiveMs) {
+      const dateToDelete = new Date(
+        snippet.createdAt.getTime() + (snippet.metadata.timeToLiveMs ?? 0)
+      );
+
+      if (dateToDelete.getTime() < Date.now()) {
+        await this.remove(id);
+        Logger.log(
+          `Removed snippet with id ${id} after ${snippet.metadata.timeToLiveMs} ms.`
+        );
+        throw new NotFoundException(`Snippet with given id: ${id} not found`);
+      }
+    }
+
+    return snippet;
+  }
+
+  findSnippetsToDelete() {
+    return this.prismaService.snippet.findMany({
+      where: { metadata: { timeToLiveMs: { gte: 0 } } },
+      include: { metadata: true }
+    });
   }
 
   async update(id: string, { newPassword, title, content }: UpdateSnippetDto) {

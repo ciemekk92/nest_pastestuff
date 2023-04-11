@@ -1,6 +1,6 @@
 export interface SnippetMetadataConfig {
   password?: string;
-  deleteAfterHours?: number;
+  timeToLiveMs?: number;
 }
 
 export interface SnippetMetadataUpdateDto {
