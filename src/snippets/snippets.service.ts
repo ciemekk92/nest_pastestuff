@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SnippetMetadatasService } from '../snippet-metadatas/snippet-metadatas.service';
 import { CreateSnippetDto } from './dto/create-snippet.dto';
 import { UpdateSnippetDto } from './dto/update-snippet.dto';
+import { Snippet, SnippetMetadata } from '@prisma/client';
 
 @Injectable()
 export class SnippetsService {
@@ -45,17 +46,7 @@ export class SnippetsService {
     }
 
     if (snippet.metadata && snippet.metadata.timeToLiveMs) {
-      const dateToDelete = new Date(
-        snippet.createdAt.getTime() + (snippet.metadata.timeToLiveMs ?? 0)
-      );
-
-      if (dateToDelete.getTime() < Date.now()) {
-        await this.remove(id);
-        Logger.log(
-          `Removed snippet with id ${id} after ${snippet.metadata.timeToLiveMs} ms.`
-        );
-        throw new NotFoundException(`Snippet with given id: ${id} not found`);
-      }
+      await this.removeSnippetIfOutdated(snippet.id, snippet);
     }
 
     return snippet;
@@ -90,5 +81,28 @@ export class SnippetsService {
 
   remove(id: string) {
     return this.prismaService.snippet.delete({ where: { id } });
+  }
+
+  async removeSnippetIfOutdated(
+    id: string,
+    snippet:
+      | (Snippet & {
+          metadata: SnippetMetadata | null;
+        })
+      | null
+  ) {
+    if (!snippet || !snippet.metadata) return;
+
+    const dateToDelete = new Date(
+      snippet.createdAt.getTime() + (snippet.metadata.timeToLiveMs ?? 0)
+    );
+
+    if (dateToDelete.getTime() < Date.now()) {
+      await this.remove(id);
+      Logger.log(
+        `Removed snippet with id ${id} after ${snippet.metadata.timeToLiveMs} ms.`
+      );
+      throw new NotFoundException(`Snippet with given id: ${id} not found`);
+    }
   }
 }
