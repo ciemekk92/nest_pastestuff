@@ -12,11 +12,11 @@ export class SnippetMetadatasService {
 
   async createSnippetMetadata({
     password,
-    deleteAfterHours
+    timeToLiveMs
   }: SnippetMetadataConfig) {
     return {
       password: await PasswordUtil.hashPassword(password),
-      deleteAfterHours
+      timeToLiveMs
     };
   }
 
